@@ -1,6 +1,5 @@
-import { RefreshCcw, Trash } from "lucide-react"
+import { Plus, RefreshCcw, Trash } from "lucide-react"
 import { useEffect, useState } from "react"
-
 
 export default function App() {
   /* Список привычек */
@@ -15,6 +14,9 @@ export default function App() {
   })
   /* Новая привычка */
   const [newHabit, setNewHabit] = useState('')
+  /* Процент прогресса */
+  const progress = habits.length === 0 ? 0 : Math.round((done.length / habits.length) * 100)
+
   /* Заполнение списка привычек в localStorage */
   useEffect(() => {
     localStorage.setItem('habits', JSON.stringify(habits))
@@ -54,6 +56,16 @@ export default function App() {
             <RefreshCcw className='w-4 h-4' /> Новый день
           </button>
         </section>
+        <section className='flex items-center gap-2 mb-6'>
+          <span className="text-gray-400 text-sm whitespace-nowrap">Прогресс:</span>
+          <div className="flex-1 h-3 bg-gray-700 rounded-lg overflow-hidden">
+            <div
+              style={{ width: `${progress}%` }}
+              className="h-full bg-green-500 rounded-lg transition-all duration-300"
+            />
+          </div>
+          <span className="text-gray-400 text-sm whitespace-nowrap">{progress}%</span>
+        </section>
         <section className='flex flex-col items-center gap-3 mb-6'>
           <span className="text-gray-400 text-sm">Добавить новую привычку:</span>
           <input
@@ -65,10 +77,10 @@ export default function App() {
             onKeyDown={(e) => e.key === 'Enter' && addHabit()}
           />
           <button
-            className="bg-green-500 text-white rounded-lg px-2 py-1 mt-2"
+            className="bg-green-500 text-white flex items-center gap-2 rounded-lg px-2 py-1 mt-2"
             onClick={() => addHabit()}
           >
-            Добавить
+            <Plus className='w-4 h-4' /> Добавить
           </button>
         </section>
         <section className="flex flex-col gap-3 overflow-y-auto flex-1 min-h-0 pr-4">
