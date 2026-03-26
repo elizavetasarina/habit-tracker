@@ -1,4 +1,4 @@
-import { Trash } from "lucide-react"
+import { RefreshCcw, Trash } from "lucide-react"
 import { useEffect, useState } from "react"
 
 
@@ -45,8 +45,16 @@ export default function App() {
   return (
     <div className='min-h-screen bg-gray-950 flex items-center justify-center p-4'>
       <div className='bg-gray-900 rounded-2xl p-8 w-full max-w-md shadow-xl flex flex-col max-h-[90vh]'>
-        <h1 className="text-white text-2xl font-bold mb-6">Трекер привычек</h1>
-        <div className='flex flex-col items-center gap-3 mb-6'>
+        <section className='flex items-center justify-between'>
+          <h1 className="text-white text-2xl font-bold mb-6">Трекер привычек</h1>
+          <button
+            className="bg-green-500 text-white rounded-lg px-2 py-1 mb-6 flex items-center gap-2"
+            onClick={() => setDone([])}
+          >
+            <RefreshCcw className='w-4 h-4' /> Новый день
+          </button>
+        </section>
+        <section className='flex flex-col items-center gap-3 mb-6'>
           <span className="text-gray-400 text-sm">Добавить новую привычку:</span>
           <input
             type='text'
@@ -57,39 +65,40 @@ export default function App() {
             onKeyDown={(e) => e.key === 'Enter' && addHabit()}
           />
           <button
-            className="bg-green-500 text-white rounded-lg px-4 py-2 mt-2"
+            className="bg-green-500 text-white rounded-lg px-2 py-1 mt-2"
             onClick={() => addHabit()}
           >
             Добавить
           </button>
-        </div>
-         <div className="flex flex-col gap-3 overflow-y-auto flex-1 min-h-0 pr-4">
+        </section>
+        <section className="flex flex-col gap-3 overflow-y-auto flex-1 min-h-0 pr-4">
           {habits.map(habit => (
-            <div className={`flex items-center justify-between relative pr-4 rounded-xl cursor-pointer transition-all${done.includes(habit)
-                ? "bg-green-500/20 border border-green-500/40"
-                : "bg-gray-800 border border-gray-700 hover:border-gray-500"
-                }`}>
-            <label
+            <div
               key={habit}
-              className={`flex items-center gap-3 w-full cursor-pointer p-4`}
+              className={`flex items-center justify-between relative pr-4 rounded-xl cursor-pointer transition-all 
+                ${done.includes(habit)
+                  ? "bg-green-500/20 border border-green-500/40"
+                  : "bg-gray-800 border border-gray-700 hover:border-gray-500"
+                }`}
             >
-              <input
-                type="checkbox"
-                checked={done.includes(habit)}
-                onChange={() => toggle(habit)}
-                className="w-5 h-5 accent-green-500 cursor-pointer"
+              <label className={`flex items-center gap-3 w-full cursor-pointer p-4`}>
+                <input
+                  type="checkbox"
+                  checked={done.includes(habit)}
+                  onChange={() => toggle(habit)}
+                  className="w-5 h-5 accent-green-500 cursor-pointer"
+                />
+                <span className={`text-base ${done.includes(habit) ? "text-green-400 line-through" : "text-gray-200"}`}>
+                  {habit}
+                </span>
+              </label>
+              <Trash
+                className="w-5 h-5 text-gray-400 hover:text-gray-200 cursor-pointer"
+                onClick={() => deleteHabit(habit)}
               />
-              <span className={`text-base ${done.includes(habit) ? "text-green-400 line-through" : "text-gray-200"}`}>
-                {habit}
-              </span>
-            </label>
-            <Trash 
-              className="w-5 h-5 text-gray-400 hover:text-gray-200 cursor-pointer"
-              onClick={() => deleteHabit(habit)}
-            />
             </div>
           ))}
-        </div>
+        </section>
         <p className="text-gray-400 text-sm mt-6">
           Выполнено: <span className="text-white font-bold">{done.length}</span> из {habits.length}
         </p>
