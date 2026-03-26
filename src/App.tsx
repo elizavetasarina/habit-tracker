@@ -1,3 +1,4 @@
+import { Trash } from "lucide-react"
 import { useEffect, useState } from "react"
 
 
@@ -36,10 +37,14 @@ export default function App() {
     setHabits([...habits, newHabit])
     setNewHabit('')
   }
+  /* Удаление привычки */
+  const deleteHabit = (habit: string) => {
+    setHabits(habits.filter(h => h !== habit))
+  }
 
   return (
-    <div className='min-h-screen bg-gray-950 flex items-center justify-center'>
-      <div className='bg-gray-900 rounded-2xl p-8 w-full max-w-md shadow-xl'>
+    <div className='min-h-screen bg-gray-950 flex items-center justify-center p-4'>
+      <div className='bg-gray-900 rounded-2xl p-8 w-full max-w-md shadow-xl flex flex-col max-h-[90vh]'>
         <h1 className="text-white text-2xl font-bold mb-6">Трекер привычек</h1>
         <div className='flex flex-col items-center gap-3 mb-6'>
           <span className="text-gray-400 text-sm">Добавить новую привычку:</span>
@@ -58,14 +63,15 @@ export default function App() {
             Добавить
           </button>
         </div>
-        <div className="flex flex-col gap-3">
+         <div className="flex flex-col gap-3 overflow-y-auto flex-1 min-h-0 pr-4">
           {habits.map(habit => (
-            <label
-              key={habit}
-              className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer transition-all ${done.includes(habit)
+            <div className={`flex items-center justify-between relative pr-4 rounded-xl cursor-pointer transition-all${done.includes(habit)
                 ? "bg-green-500/20 border border-green-500/40"
                 : "bg-gray-800 border border-gray-700 hover:border-gray-500"
-                }`}
+                }`}>
+            <label
+              key={habit}
+              className={`flex items-center gap-3 w-full cursor-pointer p-4`}
             >
               <input
                 type="checkbox"
@@ -77,6 +83,11 @@ export default function App() {
                 {habit}
               </span>
             </label>
+            <Trash 
+              className="w-5 h-5 text-gray-400 hover:text-gray-200 cursor-pointer"
+              onClick={() => deleteHabit(habit)}
+            />
+            </div>
           ))}
         </div>
         <p className="text-gray-400 text-sm mt-6">
