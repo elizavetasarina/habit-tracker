@@ -1,0 +1,1 @@
+{"root":["./src/main.tsx","./src/app/app.tsx","./src/features/habits/index.ts","./src/features/habits/model/usehabits.ts","./src/features/habits/ui/habitinput.tsx","./src/features/habits/ui/habititem.tsx","./src/features/habits/ui/habitlist.tsx","./src/features/habits/ui/progressbar.tsx","./src/shared/hooks/uselocalstorage.ts","./vite.config.ts"],"version":"5.9.3"}
