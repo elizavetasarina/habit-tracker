@@ -8,7 +8,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <div className="bg-gray-900 rounded-2xl p-8 pb-4 w-full max-w-md shadow-xl flex flex-col h-[80vh]">
+      <div className="bg-gray-900 rounded-2xl p-8 pb-4 w-full max-w-md shadow-xl flex flex-col h-[95vh]">
         <HeaderMenu
           newHabit={newHabit}
           setNewHabit={setNewHabit}
