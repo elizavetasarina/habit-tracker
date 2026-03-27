@@ -5,6 +5,7 @@ import './app/styles/global.css'
 import App from './app/App.tsx'
 
 WebApp.ready()
+WebApp.expand()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
