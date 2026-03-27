@@ -4,8 +4,12 @@ import { createRoot } from 'react-dom/client'
 import './app/styles/global.css'
 import App from './app/App.tsx'
 
-WebApp.ready()
-WebApp.expand()
+try {
+  WebApp.ready()
+  WebApp.expand()
+} catch {
+  // Not in Telegram context
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
