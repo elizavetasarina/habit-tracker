@@ -1,75 +1,122 @@
-# React + TypeScript + Vite
+<div align="center">
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# HABIT TRACKER
 
-Currently, two official plugins are available:
+**Минималистичный трекер привычек — как Telegram Mini App, так и обычное веб-приложение.**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+React 19 · TypeScript · Vite · Tailwind CSS · Framer Motion
 
-## React Compiler
+</div>
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+---
 
-Note: This will impact Vite dev & build performances.
+## О проекте
 
-## Expanding the ESLint configuration
+Трекер привычек: отмечаешь выполненные привычки за день, видишь прогресс в процентах, в конце дня сбрасываешь отметки и начинаешь заново. Всё хранится локально в браузере — бэкенда и базы данных нет. Приложение рассчитано на запуск как **Telegram Mini App** (через `@twa-dev/sdk`), но открывается и как обычный сайт — SDK просто не активируется вне Telegram.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Возможности
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Список привычек с отметкой «выполнено / не выполнено»
+- Прогресс-бар: процент выполненных привычек за день
+- Добавление новой привычки через выпадающую панель в шапке (с валидацией — пустое имя и дубликаты отклоняются)
+- Удаление привычки из списка
+- Кнопка «Новый день» — сбрасывает отметки о выполнении, сам список привычек сохраняется
+- Анимации появления/удаления карточек и разворачивания панели (Framer Motion)
+- Данные переживают перезагрузку страницы (persist в `localStorage`)
+- Интеграция с Telegram Mini Apps: `WebApp.ready()` + `WebApp.expand()` при старте
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Стек
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Слой | Технологии |
+|---|---|
+| Frontend | React 19, TypeScript, Vite 8 |
+| Стили | Tailwind CSS 3 |
+| Анимации | Framer Motion |
+| Иконки | lucide-react |
+| Компилятор | React Compiler (babel-plugin-react-compiler, через `@rolldown/plugin-babel`) |
+| Платформа | Telegram Mini Apps (`@twa-dev/sdk`) |
+| Хранение данных | `localStorage` (без бэкенда) |
+
+## Архитектура
+
+Проект собран по **FSD-lite**: слой приложения отделён от слоя фичи, у фичи есть свои `model` (логика/состояние) и `ui` (компоненты), общие переиспользуемые куски вынесены в `shared`.
+
+```
+src/
+├── app/
+│   ├── App.tsx              # корневой компонент, собирает фичу habits воедино
+│   └── styles/global.css    # Tailwind + глобальные стили
+├── features/
+│   └── habits/
+│       ├── index.ts         # публичный API фичи (barrel-экспорт)
+│       ├── model/
+│       │   └── useHabits.ts # вся логика: список, отметки, добавление/удаление, прогресс
+│       └── ui/
+│           ├── HeaderMenu.tsx   # шапка: заголовок, меню (добавить / новый день), панель добавления
+│           ├── HabitList.tsx    # список карточек привычек с анимацией
+│           ├── HabitItem.tsx    # карточка одной привычки (чекбокс + удаление)
+│           ├── ProgressBar.tsx  # полоса прогресса за день
+│           └── HabitInput.tsx   # отдельная форма добавления привычки
+├── shared/
+│   └── hooks/
+│       └── useLocalStorage.ts   # generic-хук синхронизации состояния с localStorage
+└── main.tsx                     # точка входа, инициализация Telegram WebApp
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Как это работает
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Весь стейт живёт в хуке `useHabits` (`src/features/habits/model/useHabits.ts`):
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `habits: string[]` — список привычек, по умолчанию — `Спорт`, `Чтение`, `Вода`, `Сон до 23:00`
+- `done: string[]` — какие привычки отмечены выполненными сегодня
+- `progress` — `done.length / habits.length` в процентах
+- `addHabit` / `deleteHabit` / `toggle` — мутации списка и отметок
+- `resetDay` — очищает `done`, не трогая сам список привычек
+
+Оба массива (`habits`, `done`) хранятся через `useLocalStorage` — обёртку над `useState`, которая читает начальное значение из `localStorage` и сохраняет туда же при каждом изменении.
+
+## Быстрый старт
+
+Требуется Node.js (см. версии зависимостей — React 19 / Vite 8, рекомендуется Node 20+).
+
+```bash
+git clone https://github.com/elizavetasarina/habit-tracker.git
+cd habit-tracker
+npm install
+npm run dev
 ```
+
+Приложение откроется на **http://localhost:5173** (порт по умолчанию у Vite).
+
+## Скрипты
+
+| Команда | Что делает |
+|---|---|
+| `npm run dev` | Дев-сервер с HMR |
+| `npm run build` | Проверка типов (`tsc -b`) + продакшн-сборка (`vite build`) |
+| `npm run preview` | Локальный просмотр собранного билда |
+| `npm run lint` | ESLint |
+
+## Запуск как Telegram Mini App
+
+1. Задеплоить собранный `dist/` на любой HTTPS-хостинг (Vercel, Netlify, GitHub Pages и т.п.).
+2. В [@BotFather](https://t.me/BotFather) создать бота (или использовать существующего) и настроить Mini App / Web App, указав URL деплоя.
+3. Открыть бота в Telegram — приложение запустится внутри клиента, `WebApp.ready()` и `WebApp.expand()` (см. `src/main.tsx`) применятся автоматически.
+
+Вне Telegram (обычный браузер) вызовы SDK просто падают в `catch` и игнорируются — приложение работает как обычный SPA.
+
+## Хранение данных
+
+Бэкенда нет — все привычки и отметки о выполнении хранятся в `localStorage` браузера/клиента, в котором открыто приложение. Это значит:
+
+- данные не синхронизируются между устройствами;
+- очистка данных сайта / кэша Telegram удалит весь прогресс;
+- при желании добавить синхронизацию — потребуется вынести `useHabits` на сервер (API + БД).
+
+## Возможные направления развития
+
+- Синхронизация привычек между устройствами (бэкенд + БД)
+- История выполнения по дням/неделям, а не только «сегодня»
+- Напоминания через Telegram Bot API
+- Тёмная/светлая тема, кастомизация цвета отметки
+- Категории/группы привычек
